@@ -1,0 +1,6 @@
+torch==2.0.0
+torchvision==0.15.1
+tqdm==4.65.0
+matplotlib==3.7.1
+seaborn==0.12.2
+torchinfo==1.7.2
