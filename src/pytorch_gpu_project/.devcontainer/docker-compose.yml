@@ -9,7 +9,7 @@ services:
       dockerfile: pytorch_gpu_project/.devcontainer/Dockerfile
     volumes:
       - ../../..:/workspace:cached
-      - ../../../data:/workspace/src/pytorch_gpu_project/data #:cached ?
+      - ../../../data:/workspace/src/pytorch_gpu_project/data:cached 
     
     command: /bin/sh -c "while sleep 1000; do :; done"
     deploy:
