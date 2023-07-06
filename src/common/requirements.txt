@@ -12,4 +12,3 @@ pytest-cov==4.0.0
 pre-commit==3.2.1
 
 # other libraries for common modules
-ipykernel==6.22.0

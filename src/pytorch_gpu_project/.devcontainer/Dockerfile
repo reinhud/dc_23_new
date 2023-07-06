@@ -9,7 +9,7 @@ RUN apt-get update \
     sudo \
     && rm -rf /var/lib/apt/lists/*
 
-# TODO: create non-root user and set the default user
+# TODO: create non-root user and set the default user but make sure user can save files on host, for example make the user the same as user from host but not root?
 #ARG USERNAME=devuser
 #ARG USER_UID=1000
 #ARG USER_GID=$USER_UID

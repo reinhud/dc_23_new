@@ -8,7 +8,9 @@ services:
       context: ../../
       dockerfile: pytorch_gpu_project/.devcontainer/Dockerfile
     volumes:
+      # Mount the root folder that contains .git
       - ../../..:/workspace:cached
+      # Mount data folder
       - ../../../data:/workspace/src/pytorch_gpu_project/data:cached 
     
     command: /bin/sh -c "while sleep 1000; do :; done"
