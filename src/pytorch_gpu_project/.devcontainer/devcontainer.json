@@ -14,11 +14,6 @@
             "username": "devuser"
         }
     },
-    // TODO: This is marked as problem but sample_main still says gpu is available
-    "runArgs": [
-        "--gpus",
-        "all"
-    ],
     "customizations": {
         "vscode": {
             "extensions": [
