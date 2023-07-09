@@ -12,8 +12,8 @@
             "configureZshAsDefaultShell": true,
             "installOhMyZsh": true,
             "upgradePackages": false,
-            "username": "devuser",
-        },
+            "username": "devuser"
+        }
     },
     "customizations": {
         "vscode": {
@@ -36,7 +36,7 @@
                 "njpwerner.autodocstring",
                 "redhat.vscode-yaml",
                 "streetsidesoftware.code-spell-checker",
-                "timonwong.shellcheck",
+                "timonwong.shellcheck"
             ],
             "settings": {
                 "autoDocstring.docstringFormat": "google",
@@ -64,8 +64,8 @@
                 "isort.args": [
                     "--profile",
                     "black"
-                ],
-            },
+                ]
+            }
         }
-    },
+    }
 }

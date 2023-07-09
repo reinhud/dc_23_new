@@ -138,6 +138,7 @@ dmypy.json
 cython_debug/
 
 # data folder
-data/raw/
+**/data/raw/
+src/pytorch_gpu_project/src/training/best_model.pt
 
 
