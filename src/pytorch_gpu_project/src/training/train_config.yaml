@@ -1,0 +1,75 @@
+logLevel: WARN
+
+ModelUsed: ResNet-34
+
+General:
+  InputSize: 224
+  NumEpochs: 100
+  BatchSize: 16
+  Metric: "accuracy"
+
+
+Model:
+  ResNet-34:
+    TimmName: "resnet34"
+
+    Pretrained: True
+
+    Optimizer:
+      Name: "RMSprop"
+      LearningRate: 0.0001
+      WeightDecay: 0.01
+
+    Scheduler:
+      Name: "CosineAnnealingLR"
+      TMax: 100
+      EtaMin: 0.000001
+
+    Loss:
+      Train:
+        Name: "BinaryCrossEntropyLoss"
+        BceTargetThresh: 0.2
+        Smoothing: 0.1
+
+      Validate:
+        Name: "CrossEntropyLoss"
+        BceTargetThresh: 0.2
+        Smoothing: 0.1
+
+    MixupArgs:
+      Smoothing: 0.1
+      Mixup: 0.2
+      Cutmix: 1.0
+
+
+  VIT-Base:
+    TimmName: "vit_base_patch16_224.augreg2_in21k_ft_in1k"
+
+    Pretrained: True
+
+    Optimizer:
+      Name: "RMSprop"
+      LearningRate: 0.0001
+      WeightDecay: 0.01
+
+    Scheduler:
+      Name: "CosineAnnealingLR"
+      TMax: 100
+      EtaMin: 0.000001
+
+    Loss:
+      Name: "CrossEntropyLoss"
+      BceTargetThresh: 0.7
+      Smoothing: 0.1
+
+    MixupArgs:
+      Smoothing: 0.1
+      Mixup: 0.0
+      Cutmix: 0.0
+
+
+    
+
+    
+
+    

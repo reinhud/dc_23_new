@@ -1,0 +1,2 @@
+default_train_config_path: None # use timm default resnet50 for now
+default_data_path: "src/data/raw/CN_dataset_04_23/data_types_example"

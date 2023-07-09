@@ -1,29 +1,43 @@
+import confuse
 import timm
 import torch
+from timm.loss import BinaryCrossEntropy
+from timm.optim import create_optimizer_v2
 
-from src.data.coin_data import CoinData, CoinDataFolder
+from src.data.datasets.coin_data import CoinData, CoinDataFolder
 from src.training.trainer import Trainer
 
 
-def training():
-    # Set training arguments, hardcoded here for clarity
-    image_size = (224, 224)
-    lr = 5e-3
-    smoothing = 0.1
-    mixup = 0.2
-    cutmix = 1.0
-    batch_size = 16
-    bce_target_thresh = 0.2
-    num_epochs = 50
+# TODO: load from env
+class TrainingConfig:
+    def __init__(self):
+        self.config = confuse.Configuration("train_config", __name__)
+        self.config.set_file('train_config.yaml')
 
+        self.model = self.config["ModelUsed"].get()
+        self.model_timm_name = self.config["Model"][self.model]["TimmName"].get()
+        self.input_size = self.config["General"]["InputSize"].get()
+        self.num_epochs = self.config["General"]["NumEpochs"].get()
+        self.batch_size = self.config["General"]["BatchSize"].get()
+        self.optimizer = self.config["ModelUsed"].get()
+        self.loss = self.config["ModelUsed"].get()
+        self.lr = self.config["ModelUsed"].get()
+        self.smoothing = self.config["ModelUsed"].get()
+        self.mixup = self.config["ModelUsed"].get()
+        self.cutmix = self.config["ModelUsed"].get()
+        self.bce_target_thresh = self.config["ModelUsed"].get()
+
+
+def training():
+    train_config = TrainingConfig()
     # load data
     coin_data = CoinData(folder=CoinDataFolder.TYPES_EXAMPLE)
     num_classes = len(coin_data.images_and_targets)
 
     mixup_args = dict(
-        mixup_alpha=mixup,
-        cutmix_alpha=cutmix,
-        label_smoothing=smoothing,
+        mixup_alpha=train_config.mixup,
+        cutmix_alpha=train_config.cutmix,
+        label_smoothing=train_config.smoothing,
         num_classes=num_classes,
     )
 
@@ -37,15 +51,16 @@ def training():
     data_mean = data_config["mean"]
     data_std = data_config["std"]
 
-    train_dataset, eval_dataset = coin_data.generate_train_val_datasets(val_pct=0.3, image_size=image_size, data_mean=data_mean, data_std=data_std)
+    train_dataset, eval_dataset = coin_data.generate_train_val_datasets(val_pct=0.3, image_size=train_config.image_size, data_mean=data_mean, data_std=data_std)
 
     # Create optimizer
-    optimizer = timm.optim.create_optimizer_v2(
+    optimizer = create_optimizer_v2(
         model, opt="lookahead_AdamW", lr=lr, weight_decay=0.01
     )
 
     # As we are using Mixup, we can use BCE during training and CE for evaluation
-    train_loss_fn = timm.loss.BinaryCrossEntropy(
-        target_threshold=bce_target_thresh, smoothing=smoothing
+    train_loss_fn = BinaryCrossEntropy(
+        target_threshold=train_config.
+        bce_target_thresh, smoothing=train_config.smoothing
     )
     validate_loss_fn = torch.nn.CrossEntropyLoss()
