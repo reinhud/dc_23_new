@@ -15,7 +15,7 @@ if __name__ == "__main__":
     main()
 
 # TODO: Add logging
-# TODO: save best models and changes according to architecture, make it smaller, only load model architechture and params?
+# TODO: save best models and changes according to architecture, make it smaller, only load model architechture and params?  # noqa: E501
 # TODO: write inference loop
 # TODO: make test setup where couple different architecture setups are tested
 # TODO: integrate a config for training runs
@@ -24,3 +24,5 @@ if __name__ == "__main__":
 # TODO: builde api for inference
 # TODO: docs schreiben
 # TODO: optimize models like so? https://pytorch.org/blog/Accelerating-Hugging-Face-and-TIMM-models/
+# TODO: add logic to optionally save all trianing runs or only when model performed better, or only save some params like summary and args?  # noqa: E501
+# TODO: make logged output of training run prettier (tqdm bar for epochs and subbar for epoch?)
