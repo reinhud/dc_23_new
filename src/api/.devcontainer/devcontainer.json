@@ -1,10 +1,10 @@
 {
-    "name": "Model Service",
+    "name": "FastAPI Service",
     "dockerComposeFile": [
         "docker-compose.yml"
     ],
-    "workspaceFolder": "/workspace/src/pytorch_gpu_project",
-    "service": "pytorch_gpu_project",
+    "workspaceFolder": "/workspace/src/api",
+    "service": "api",
     "shutdownAction": "none",
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
@@ -14,6 +14,9 @@
             "username": "devuser"
         }
     },
+    "forwardPorts": [
+        "8000:8000"
+    ],
     "customizations": {
         "vscode": {
             "extensions": [

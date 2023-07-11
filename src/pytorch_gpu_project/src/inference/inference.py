@@ -64,7 +64,7 @@ _logger = logging.getLogger("inference")
 parser = _inference_parser()
 
 
-def main():
+def infer():
     setup_default_logging()
     args = parser.parse_args()
     # might as well try to do something useful...
@@ -289,4 +289,4 @@ def save_results(df, results_filename, results_format="csv", filename_col="filen
 
 
 if __name__ == "__main__":
-    main()
+    infer()
