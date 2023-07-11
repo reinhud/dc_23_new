@@ -1,10 +1,10 @@
 {
-    "name": "Model Service",
+    "name": "Model Service CPU Sample",
     "dockerComposeFile": [
         "docker-compose.yml"
     ],
-    "workspaceFolder": "/workspace/src/pytorch_gpu_project",
-    "service": "pytorch_gpu_project",
+    "workspaceFolder": "/workspace/src/sample_cpu_project",
+    "service": "sample_cpu_project",
     "shutdownAction": "none",
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
