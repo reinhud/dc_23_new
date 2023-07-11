@@ -2,8 +2,8 @@ import argparse
 
 import confuse
 
+from src.training.timm_trainer import TimmTrainer
 from src.training.training_config import TrainConfig
-from training.timm_trainer import TimmTrainer
 
 config = confuse.Configuration('Train Setup Parser')
 config.set_file('src/training/train_config/base_config.yaml')
