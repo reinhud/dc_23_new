@@ -9,7 +9,6 @@ from functools import partial
 import torch
 import torch.nn as nn
 import torchvision.utils
-from src.training.train_config.training_config import TrainConfig
 from timm import utils
 from timm.data import (
     AugMixDataset,
@@ -38,6 +37,8 @@ from timm.optim import create_optimizer_v2, optimizer_kwargs
 from timm.scheduler import create_scheduler_v2, scheduler_kwargs
 from timm.utils import ApexScaler, NativeScaler
 from torch.nn.parallel import DistributedDataParallel as NativeDDP
+
+from src.training.training_config import TrainConfig
 
 
 class TimmTrainer:
@@ -564,7 +565,7 @@ class TimmTrainer:
                 ):
                     loader_train.sampler.set_epoch(epoch)
 
-                train_metrics = self.train_one_epoch(
+                train_metrics = self._train_one_epoch(
                     epoch,
                     model,
                     loader_train,
@@ -594,7 +595,7 @@ class TimmTrainer:
                         self.train_config.dist_bn == "reduce",
                     )
 
-                eval_metrics = self.validate(
+                eval_metrics = self._validate(
                     model,
                     loader_eval,
                     validate_loss_fn,
@@ -654,7 +655,7 @@ class TimmTrainer:
                 "*** Best metric: {0} (epoch {1})".format(best_metric, best_epoch)
             )
 
-    def train_one_epoch(
+    def _train_one_epoch(
         self,
         epoch,
         model,
@@ -828,7 +829,7 @@ class TimmTrainer:
 
         return OrderedDict([("loss", losses_m.avg)])
 
-    def validate(
+    def _validate(
         self,
         model,
         loader,
@@ -867,7 +868,7 @@ class TimmTrainer:
                         output = output.unfold(0, reduce_factor, reduce_factor).mean(
                             dim=2
                         )
-                        target = target[0 : target.size(0) : reduce_factor]
+                        target = target[0: target.size(0): reduce_factor]
 
                     loss = loss_fn(output, target)
                 acc1, acc5 = utils.accuracy(output, target, topk=(1, 5))

@@ -14,7 +14,6 @@ from functools import partial
 import numpy as np
 import pandas as pd
 import torch
-from src.inference.inference_config.config_parser import _inference_parser
 from timm.data import (
     ImageNetInfo,
     create_dataset,
@@ -25,6 +24,8 @@ from timm.data import (
 from timm.layers import apply_test_time_pool
 from timm.models import create_model
 from timm.utils import AverageMeter, set_jit_fuser, setup_default_logging
+
+from src.inference.inference_config.config_parser import _inference_parser
 
 try:
     from apex import amp  # noqa: F401  # type: ignore
@@ -145,6 +146,7 @@ def infer():
     if args.num_gpu > 1:
         model = torch.nn.DataParallel(model, device_ids=list(range(args.num_gpu)))
 
+    # TODO: change that part
     root_dir = args.data or args.data_dir
     dataset = create_dataset(
         root=root_dir,

@@ -1,0 +1,20 @@
+# Ensure these req versions are in sync together with the following so that code quality checks are consistent:
+# - src/common/requirements.txt
+# - notebooks/.devcontainer/requirements.txt
+# - .github/workflows/requirements.txt
+torch==2.0.0
+torchvision==0.15.1
+torchmetrics==1.0.0
+matplotlib==3.7.1
+seaborn==0.12.2
+torchinfo==1.7.2
+timm==0.9.2
+confuse==2.0.1  # not needed by timm
+PyYAML==6.0
+tqdm==4.65.0
+
+
+# TODO: notebooks specific requirements, remove later, onmly for testing
+ipykernel==6.22.0
+nbconvert==7.2.10
+nbformat==5.8.0

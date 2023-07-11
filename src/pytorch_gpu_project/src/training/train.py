@@ -1,11 +1,12 @@
 import argparse
 
 import confuse
-from src.training.timmtrainer import TimmTrainer
-from src.training.train_config.training_config import TrainConfig
 
-config = confuse.Configuration("Train Setup Parser")
-config.set_file("src/training/train_config/base_config.yaml")
+from src.training.training_config import TrainConfig
+from training.timm_trainer import TimmTrainer
+
+config = confuse.Configuration('Train Setup Parser')
+config.set_file('src/training/train_config/base_config.yaml')
 
 
 def cli_train_args():
@@ -43,7 +44,7 @@ def cli_train_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     args = cli_train_args()
 
     # config.set_args(args, dots=True)

@@ -10,6 +10,7 @@ class TrainConfig:
     base_config = confuse.Configuration("Base Train Config")
     base_config.set_file(BASE_CONFIG_PATH)
 
+    # TODO: add type to input from config
     def __init__(
         self,
         data_dir=base_config["data_dir"]["default"].get(),
