@@ -1,11 +1,11 @@
 import confuse
-import yaml
+import yaml  # type: ignore
 
 
 class TrainConfig:
     """Class to hold all training base_configuration parameters."""
 
-    BASE_CONFIG_PATH = "src/training1/config/base_config.yaml"
+    BASE_CONFIG_PATH = "src/training/config/base_config.yaml"
 
     base_config = confuse.Configuration("Base Train Config")
     base_config.set_file(BASE_CONFIG_PATH)

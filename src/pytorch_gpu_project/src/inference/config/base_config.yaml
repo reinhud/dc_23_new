@@ -1,5 +1,5 @@
 pretrained: False
-device: cuda    # TODO: build logic to check if cuda is available and run on cpu otherwise  
+device: cuda    
 amp: False
 amp_dtype: float16
 fuser: ""

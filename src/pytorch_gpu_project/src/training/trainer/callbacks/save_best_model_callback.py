@@ -1,10 +1,13 @@
+import csv
 import datetime as dt
 import os
 
 import numpy as np
+import yaml
 from pytorch_accelerated.callbacks import TrainerCallback
 
-from src.training1.config.train_config import TrainConfig
+from src.training.config.train_config import TrainConfig
+from src.utils.model_manager import ModelManager
 
 
 class SaveBestModelCallback(TrainerCallback):
@@ -12,8 +15,6 @@ class SaveBestModelCallback(TrainerCallback):
     A callback which saves the best model during a training run, according to a given metric.
     The best model weights are loaded at the end of the training run.
     """
-    BASE_PATH = "src/output/train"
-
     def __init__(
         self,
         train_config: TrainConfig,
@@ -39,10 +40,6 @@ class SaveBestModelCallback(TrainerCallback):
         self.reset_on_train = reset_on_train
         self.save_optimizer = save_optimizer
 
-        # check that base folder exists
-        if not os.path.exists(self.BASE_PATH):
-            os.makedirs(self.BASE_PATH)
-
     def on_training_run_start(self, args, **kwargs):
         if self.reset_on_train:
             self.best_metric = None
@@ -52,39 +49,63 @@ class SaveBestModelCallback(TrainerCallback):
         if self.best_metric is None:
             self.best_metric = current_metric
             self.best_metric_epoch = trainer.run_history.current_epoch
-            self._save_run(trainer)
+            self._save_run_config(trainer)
         else:
             is_improvement = self.operator(current_metric, self.best_metric)
-
             if is_improvement:
-                self._save_run(trainer)
+                self._save_run_config(trainer)
 
     def on_training_run_end(self, trainer, **kwargs):
-        trainer.print(
-            f"Loading checkpoint with {self.watch_metric}: {self.best_metric}",
-            f"from epoch {self.best_metric_epoch}"
-        )
-        trainer.load_checkpoint(self.save_path)
+        self._save_run_args_to_yaml(trainer)
+        self._save_train_history(trainer)
 
-    def _save_run(self, trainer):
-        # create folder for this run
+    def _create_paths(self):
+        model_manager = ModelManager()
+
         time_tag = dt.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-        self.save_folder_path = f"{self.BASE_PATH}/{time_tag}{self.train_config.model_name}"
-        os.mkdir(self.save_folder_path)
+        train_run_path = f"{model_manager.base_output_path}/training/{self.train_config.model_name}/{time_tag}"
+        if not os.path.exists(train_run_path):
+            print("Creating training run path")
+            os.makedirs(train_run_path)
 
-        # create paths
-        self.state_dict_path = f"{self.save_folder_path}/best_model.pt"
-        self.args_path = f"{self.save_folder_path}/args.yaml"
-        self.train_history_path = f"{self.save_folder_path}/train_history.csv"
+        else:
+            print("Training run path already exists")
 
-        # save state dicts
+        state_dict_path = f"{train_run_path}/best_model.pt"
+        args_path = f"{train_run_path}/args.yaml"
+        train_history_path = f"{train_run_path}/train_history.csv"
+
+        return state_dict_path, args_path, train_history_path
+
+    def _save_run_args_to_yaml(self, trainer):
+        state_dict_path, args_path, train_history_path = self._create_paths()
+
+        with open(args_path, "w") as f:
+            yaml.dump(trainer.run_config.__dict__, f, default_flow_style=False)
+
+    def _save_train_history(self, trainer):
+        state_dict_path, args_path, train_history_path = self._create_paths()
+
+        metric_names = trainer.run_history.get_metric_names()
+        first_row = ["epoch"] + list(metric_names)
+
+        # format history
+        metrics = np.array([trainer.run_history.get_metric_values(m_name) for m_name in metric_names])
+        epochs = np.arange(1, len(metrics[0]) + 1)
+        hist = np.concatenate(([epochs], metrics), axis=0)
+        hist = np.concatenate(([first_row], hist.T), axis=0)
+
+        with open(train_history_path, "w") as f:
+            for epoch_row in hist:
+                csv_writer = csv.writer(f)
+                csv_writer.writerow(epoch_row)
+
+    def _save_run_config(self, trainer):
+        state_dict_path, args_path, train_history_path = self._create_paths()
+
         trainer.save_checkpoint(
-            save_path=self.state_dict_path,
+            save_path=state_dict_path,
             checkpoint_kwargs={self.watch_metric: self.best_metric},
             save_optimizer=self.save_optimizer,
         )
 
-        # save train args
-        self.train_config.save_to_yaml(self.args_path)
-
-        # TODO: save train history

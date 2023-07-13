@@ -5,11 +5,11 @@ from pytorch_accelerated.trainer import DEFAULT_CALLBACKS
 from timm.optim import create_optimizer_v2, optimizer_kwargs
 
 from src.data.datasets.coin_data import CoinData
-from src.training1.config.train_config import TrainConfig
-from src.training1.trainer.callbacks.save_best_model_callback import (
+from src.training.config.train_config import TrainConfig
+from src.training.trainer.callbacks.save_best_model_callback import (
     SaveBestModelCallback,
 )
-from src.training1.trainer.trainer import TimmMixupTrainer
+from src.training.trainer.timm_trainer import TimmMixupTrainer
 
 
 class Training:
@@ -112,7 +112,11 @@ class Training:
             num_classes=self.coin_data.num_classes,
             callbacks=[
                 *DEFAULT_CALLBACKS,
-                SaveBestModelCallback(watch_metric="accuracy", greater_is_better=True, train_config=self.train_config),
+                SaveBestModelCallback(
+                    watch_metric="accuracy",
+                    greater_is_better=True,
+                    train_config=self.train_config
+                ),
             ],
         )
 

@@ -70,7 +70,7 @@ class CoinData:
 
     def _split_train_val(
         self,
-        val_pct: float = 0.3,
+        val_pct: float = 0.3, # TODO: dont hardcode
         shuffle: bool = True,
         random_seed: int = 42,
     ):
