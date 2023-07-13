@@ -2,14 +2,11 @@ import argparse
 
 import confuse
 
-from src.training.config.training_config import TrainConfig
-
-#from src.training.timm_trainer import TimmTrainer
-from src.training.timm_trainer_new import TimmTrainerNew
-from src.training.timm_trainer_simple import TimmTrainerSimple
+from src.training.timm_trainer import TimmTrainer
+from src.training.training_config import TrainConfig
 
 config = confuse.Configuration('Train Setup Parser')
-config.set_file('src/training/config/base_config.yaml')
+config.set_file('src/training/train_config/base_config.yaml')
 
 
 def cli_train_args():
@@ -58,11 +55,9 @@ if __name__ == '__main__':
     cli_args = {k: v for k, v in vars(args).items() if v is not None}
     train_config = TrainConfig(**cli_args)
 
-    trainer = TimmTrainerSimple(train_config)
+    trainer = TimmTrainer(train_config)
 
-    print(trainer.model)
-
-    #trainer.train()
+    trainer.train()
 
     # print(config['opt_kwargs']["default"].get())
     # print(type(dict(config['opt_kwargs']["default"].get())))

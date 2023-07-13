@@ -1,0 +1,19 @@
+pretrained: False
+device: cuda    # TODO: build logic to check if cuda is available and run on cpu otherwise  
+amp: False
+amp_dtype: float16
+fuser: ""
+in_chans: 
+input_size:
+model: resnet34
+num_classes:
+model_kwargs:
+test_pool:
+channels_last: False
+torchscript:
+torchcompile:
+aot_autograd:
+num_gpu: 1
+topk:
+crop_pct:
+crop_mode:

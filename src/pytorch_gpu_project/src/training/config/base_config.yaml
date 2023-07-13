@@ -1,0 +1,1380 @@
+data_dir:
+  default: "src/data/raw/CN_dataset_04_23/data_types_example"
+  parser:
+    flags: ["--data-dir"]
+    nargs: [null]
+    const: 
+    type: 
+    metavar: "DIR"
+    action: 
+    help: "path to dataset (root dir)"
+
+dataset: 
+  default: ""
+  parser:
+    flags: ["--dataset"]
+    nargs: [null]
+    const: 
+    type: 
+    metavar: "NAME"
+    action:
+    help: 'dataset type + name ("<type>/<name>") (default: ImageFolder or ImageTar if empty)'
+
+train_split:
+  default: "train"
+  parser:
+    flags: ["--train-split"]
+    nargs: [null]
+    const:
+    type:
+    metavar: "NAME"
+    action:
+    help: "dataset train split (default: train)"
+
+val_split:
+  default: "validation"
+  parser:
+    flags: ["--val-split"]
+    nargs: [null]
+    const:
+    type:
+    metavar: "NAME"
+    action:
+    help: "dataset validation split (default: validation)"
+
+dataset_download:
+  default: False
+  parser:
+    flags: ["--dataset-download"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Allow download of dataset for torch/ and tfds/ datasets that support it."
+
+class_map:
+  default: ""
+  parser:
+    flags: ["--class-map"]
+    nargs: [null]
+    const:
+    type: str
+    metavar: "FILENAME"
+    action:
+    help: 'path to class to idx mapping file (default: "")'
+
+# Model parameters
+model:
+  default: "resnet34"
+  parser:
+    flags: ["--model"]
+    nargs: [null]
+    const:
+    type: str
+    metavar: "MODEL"
+    action:
+    help: 'Name of model to train (default: "resnet50")'
+
+pretrained:
+  default: False
+  parser:
+    flags: ["--pretrained"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Start with pretrained version of specified network (if avail)"
+
+initial_checkpoint:
+  default: ""
+  parser:
+    flags: ["--initial-checkpoint"]
+    nargs: [null]
+    const:
+    type: str 
+    metavar: "PATH"
+    action:
+    help: "Resume full model and optimizer state from checkpoint (default: none)"
+
+resume:
+  default: ""
+  parser:
+    flags: ["--resume"]
+    nargs: [null]
+    const:
+    type: str
+    metavar: "PATH"
+    action:
+    help: "Resume full model and optimizer state from checkpoint (default: none)"
+
+no_resume_opt:
+  default: False
+  parser:
+    flags: ["--no-resume-opt"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "prevent resume of optimizer state when resuming model"
+
+num_classes:
+  default: 
+  parser:
+    flags: ["--num-classes"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "number of label classes (Model default if None)"
+
+gp:
+  default: null
+  parser:
+    flags: ["--gp"]
+    nargs: [null]
+    const:
+    type: str
+    metavar: "POOL"
+    action:
+    help: "Global pool type, one of (fast, avg, max, avgmax, avgmaxc). Model default if None."
+
+img_size:
+  default: null
+  parser:
+    flags: ["--img-size"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "Image size (default: None => model default)"
+
+in_chans:
+  default: null
+  parser:
+    flags: ["--in-chans"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "Image input channels (default: None => 3)"
+
+input_size:
+  default: null
+  parser:
+    flags: ["--input-size"]
+    nargs: [3]
+    const:
+    type: int
+    metavar: "N N N"
+    action:
+    help: "Input all image dimensions (d h w, e.g. --input-size 3 224 224), uses model default if empty"
+
+crop_pct:
+  default: null
+  parser:
+    flags: ["--crop-pct"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "N"
+    action:
+    help: "Input image center crop percent (for validation only)"
+
+mean:
+  default: null
+  parser:
+    flags: ["--mean"]
+    nargs: ["+"]
+    const:
+    type: float
+    metavar: "MEAN"
+    action:
+    help: "Override mean pixel value of dataset"
+
+std:
+  default: null
+  parser:
+    flags: ["--std"]
+    nargs: ["+"]
+    const:
+    type: float
+    metavar: "STD"
+    action:
+    help: "Override std deviation of dataset"
+
+interpolation:
+  default: ""
+  parser:
+    flags: ["--interpolation"]
+    nargs: [null]
+    const:
+    type: str
+    metavar: "NAME"
+    action:
+    help: "Image resize interpolation type (overrides model)"
+
+batch_size:
+  default: 16   # TODO: fix in production
+  parser:
+    flags: ["-b", "--batch-size"] 
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "Input batch size for training (default: 16)"
+
+validation_batch_size:
+  default: null
+  parser: 
+    flags: ["-vb", "--validation-batch-size"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "Validation batch size override (default: None)"
+
+channels_last:
+  default: False
+  parser:
+    flags: ["--channels-last"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Use channels_last memory layout"
+
+fuser:
+  default: ""
+  parser:
+    flags: ["--fuser"]
+    nargs: [null]
+    const:
+    type: str
+    metavar:
+    action:
+    help: "Select jit fuser. One of ('', 'te', 'old', 'nvfuser')"
+
+grad_accum_steps:
+  default: 1
+  parser:
+    flags: ["--grad-accum-steps"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "The number of steps to accumulate gradients (default: 1)"
+
+grad_checkpointing:
+  default: False
+  parser:
+    flags: ["--grad-checkpointing"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Enable gradient checkpointing through model blocks/stages"
+
+fast_norm:
+  default: False
+  parser:
+    flags: ["--fast-norm"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "enable experimental fast-norm"
+
+model_kwargs:
+  default: {}
+  parser:
+    flags: ["--model-kwargs"]
+    nargs: ["*"]
+    const:
+    type:
+    metavar:
+    action: utils.ParseKwargs # TODO: how?
+    help:
+
+head_init_scale:
+  default: null
+  parser:
+    flags: ["--head-init-scale"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "Head initialization scale"
+
+head_init_bias:
+  default: null
+  parser:
+    flags: ["--head-init-bias"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "Head initialization bias value"
+
+# scripting / codegen
+torchscript:
+  default:
+  parser:
+    flags: ["--torchscript"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "torch.jit.script the full model"
+
+torchcompile:
+  default: null
+  parser:
+    flags: ["--torchcompile"]
+    nargs: ["?"]
+    const: "inductor"
+    type: str
+    metavar:
+    action:
+    help: "Enable compilation w/ specified backend (default: inductor)."
+
+opt:
+  default: "sgd"
+  parser:
+    flags: ["--opt"]
+    nargs: [null]
+    const:
+    type: str
+    metavar: "OPTIMIZER"
+    action:
+    help: 'Optimizer (default: "sgd")'
+
+opt_eps:
+  default: null
+  parser:
+    flags: ["--opt-eps"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "EPSILON"
+    action:
+    help: "Optimizer Epsilon (default: None, use opt default)"
+
+opt_betas:
+  default: null
+  parser:
+    flags: ["--opt-betas"]
+    nargs: ["+"]
+    const:
+    type: float
+    metavar: "BETA"
+    action:
+    help: "Optimizer Betas (default: None, use opt default)"
+
+momentum:
+  default: 0.9
+  parser:
+    flags: ["--momentum"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "M"
+    action:
+    help: "Optimizer momentum (default: 0.9)"
+
+weight_decay:
+  default: 0.00002   
+  parser:
+    flags: ["--weight-decay"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: 
+    action:
+    help: "weight decay (default: 2e-5)"
+
+clip_grad:
+  default: null
+  parser:
+    flags: ["--clip-grad"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "NORM"
+    action:
+    help: "Clip gradient norm (default: None, no clipping)"
+
+clip_mode:
+  default:
+  parser:
+    flags: ["--clip-mode"]
+    nargs: [null]
+    const:
+    type: str
+    metavar: "norm"
+    action:
+    help: 'Gradient clipping mode. One of ("norm", "value", "agc")'
+
+layer_decay:
+  default: null
+  parser:
+    flags: ["--layer-decay"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "layer-wise learning rate decay (default: None)"
+
+opt_kwargs:
+  default: {}   #TODO: ???
+  parser:
+    flags: ["--opt-kwargs"]
+    nargs: ["*"]
+    const:
+    type:
+    metavar:
+    action: utils.ParseKwargs   # TODO: how?
+    help:
+
+sched:
+  default: "cosine"
+  parser:
+    flags: ["--sched"]
+    nargs: [null]
+    const:
+    type: str
+    metavar: "SCHEDULER"
+    action:
+    help: 'LR scheduler (default: "step"'
+
+sched_on_updates:
+  default: False
+  parser:
+    flags: ["--sched-on-updates"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Apply LR scheduler step on update instead of epoch end."
+
+lr:
+  default: null
+  parser:
+    flags: ["--lr"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "LR"
+    action:
+    help: "learning rate, overrides lr-base if set (default: None)"
+
+lr_base:
+  default: 0.1
+  parser:
+    flags: ["--lr-base"]
+    nargs: [null]
+    const:
+    type:
+    metavar: "LR"
+    action:
+    help: "base learning rate: lr = lr_base * global_batch_size / base_size"
+
+lr_base_size:
+  default: 256
+  parser:
+    flags: ["--lr-base-size"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "DIV"
+    action:
+    help: "base learning rate batch size (divisor, default: 256)."
+
+lr_base_scale:
+  default:  ""
+  parser:
+    flags: ["--lr-base-scale"]
+    nargs: [null]
+    const:
+    type: str
+    metavar: "SCALE"
+    action:
+    help: 'base learning rate vs batch_size scaling ("linear", "sqrt", based on opt if empty)'
+
+lr_noise:
+  default: null
+  parser:
+    flags: ["--lr-noise"]
+    nargs: ["+"]
+    const:
+    type: float
+    metavar: "pct, pct"
+    action: 
+    help: "learning rate noise on/off epoch percentages"
+
+lr_noise_pct:
+  default: 0.67
+  parser:
+    flags: ["--lr-noise-pct"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "PERCENT"
+    action:
+    help: "learning rate noise limit percent (default: 0.67)"
+
+lr_noise_std:
+  default: 1.0
+  parser:
+    flags: ["--lr-noise-std"]
+    nargs: [null]
+    const:
+    type:
+    metavar: "STDDEV"
+    action:
+    help: "learning rate noise std-dev (default: 1.0)"
+
+lr_cycle_mul:
+  default: 1.0
+  parser:
+    flags: ["--lr-cycle-mul"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "MULT"
+    action:
+    help: "learning rate cycle len multiplier (default: 1.0)"
+
+lr_cycle_decay:
+  default: 0.5
+  parser:
+    flags: ["--lr-cycle-decay"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "MULT"
+    action:
+    help: "amount to decay each learning rate cycle (default: 0.5)"
+
+lr_cycle_limit:
+  default: 1
+  parser:
+    flags: ["--lr-cycle-limit"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "learning rate cycle limit, cycles enabled if > 1"
+
+lr_k_decay:
+  default: 1.0
+  parser:
+    flags: ["--lr-k-decay"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "learning rate k-decay for cosine/poly (default: 1.0)"
+
+warmup_lr:
+  default: 0.00001
+  parser:
+    flags: ["--warmup-lr"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "LR"
+    action:
+    help: "warmup learning rate (default: 0.0001)"
+
+min_lr:
+  default: 0.0
+  parser:
+    flags: ["--min-lr"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "LR"
+    action:
+    help: "lower lr bound for cyclic schedulers that hit 0 (default: 0)"
+
+epochs:
+  default: 5    # TODO: fix in production
+  parser:
+    flags: ["--epochs"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "number of epochs to train (default: 5)"
+
+epoch_repeats:
+  default: 0.0
+  parser:
+    flags: ["--epoch-repeats"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "N"
+    action:
+    help: "epoch repeat multiplier (number of times to repeat the dataset epoch per train epoch)"
+
+start_epoch:
+  default: null
+  parser:
+    flags: ["--start-epoch"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "manual epoch number (useful on restarts)"
+
+decay_milestones:
+  default: [90, 180, 270]
+  parser:
+    flags: ["--decay-milestones"]
+    nargs: ["+"]
+    const:
+    type: int
+    metavar: "MILESTONEs"
+    action:
+    help: "list of decay epoch indices for multistep lr. must be increasing"
+
+decay_epochs:
+  default: 90
+  parser:
+    flags: ["--decay-epochs"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "N"
+    action:
+    help: "epoch interval to decay LR"
+
+warmup_epochs:
+  default: 5
+  parser:
+    flags: ["--warmup-epochs"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "epochs to warmup LR, if scheduler supports"
+
+warmup_prefix:
+  default: False
+  parser:
+    flags: ["--warmup-prefix"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Exclude warmup period from decay schedule."
+
+cooldown_epochs:
+  default: 0
+  parser:
+    flags: ["--cooldown-epochs"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "epochs to cooldown LR at min_lr, after cyclic schedule ends"
+
+patience_epochs:
+  default: 10
+  parser:
+    flags: ["--patience-epochs"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "patience epochs for Plateau LR scheduler (default: 10)"
+
+decay_rate:
+  default: 0.1
+  parser:
+    flags: ["--decay-rate", "--dr"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "RATE"
+    action:
+    help: "LR decay rate (default: 0.1)"
+
+# Augmentation & regularization parameters
+no_aug:
+  default: False
+  parser:
+    flags: ["--no-aug"]
+    nargs: [null]
+    const:
+    type: 
+    metavar:
+    action: "store_true"
+    help: "Disable all training augmentation, override other train aug args"
+
+scale:
+  default: [0.08, 1.0]
+  parser:
+    flags: ["--scale"]
+    nargs: ["+"]
+    const:
+    type: float
+    metavar: "PCT"
+    action:
+    help: "Random resize scale (default: 0.08 1.0)"
+
+ratio:
+  default: [0.75, 1.33]
+  parser:
+    flags: ["--ratio"]
+    nargs: ["+"]
+    const:
+    type: float
+    metavar: "RATIO"
+    action:
+    help: "Random resize aspect ratio (default: 0.75 1.33)"
+
+hflip:
+  default: 0.5
+  parser:
+    flags: ["--hflip"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: 
+    action:
+    help: "Horizontal flip training aug probability"
+
+vflip:
+  default: 0.0
+  parser:
+    flags: ["--vflip"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "Vertical flip training aug probability"
+
+color_jitter:
+  default: 0.4
+  parser:
+    flags: ["--color-jitter"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "PCT"
+    action:
+    help: "Color jitter factor (default: 0.4)"
+
+aa:
+  default: null
+  parser:
+    flags: ["--aa"]
+    nargs: [null]
+    const:
+    type: str
+    metavar: "NAME"
+    action:
+    help: 'Use AutoAugment policy. "v0" or "original". (default: None)'
+
+aug_repeats:
+  default: 0.0
+  parser:
+    flags: ["--aug-repeats"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "Number of augmentation repetitions (distributed training only) (default: 0)"
+
+aug_splits:
+  default: 0
+  parser:
+    flags: ["--aug-splits"]
+    nargs: [null]
+    const:
+    type: int
+    metavar:
+    action:
+    help: "Number of augmentation splits (default: 0, valid: 0 or >=2)"
+
+jsd_loss:
+  default: False
+  parser:
+    flags: ["--jsd-loss"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Enable Jensen-Shannon Divergence + CE loss. Use with `--aug-splits`."
+
+bce_loss:
+  default: False
+  parser:
+    flags: ["--bce-loss"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Enable BCE loss w/ Mixup/CutMix use."
+
+bce_target_thresh:
+  default: null
+  parser:
+    flags: ["--bce-target-thresh"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "Threshold for binarizing softened BCE targets (default: None, disabled)"
+
+reprob:
+  default: 0.0
+  parser:
+    flags: ["--reprob"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "PCT"
+    action:
+    help: "Random erase prob (default: 0.)"
+
+remode:
+  default: "pixel"
+  parser:
+    flags: ["--remode"]
+    nargs: [null]
+    const:
+    type: str
+    metavar:
+    action:
+    help: 'Random erase mode (default: "pixel")'
+
+recount:
+  default: 1
+  parser:
+    flags: ["--recount"]
+    nargs: [null]
+    const:
+    type: int
+    metavar:
+    action:
+    help: "Random erase count (default: 1)"
+
+resplit:
+  default: False
+  parser:
+    flags: ["--resplit"]
+    nargs: [null]
+    const:
+    type: 
+    metavar:
+    action: "store_true"
+    help: "Do not random erase first (clean) augmentation split"
+
+mixup:
+  default: 0.0
+  parser:
+    flags: ["--mixup"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "mixup alpha, mixup enabled if > 0. (default: 0.)"
+
+cutmix:
+  default: 0.0
+  parser:
+    flags: ["--cutmix"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "cutmix alpha, cutmix enabled if > 0. (default: 0.)"
+
+cutmix_minmax:
+  default: null
+  parser:
+    flags: ["--cutmix-minmax"]
+    nargs: ["+"]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "cutmix min/max ratio, overrides alpha and enables cutmix if set (default: None)"
+
+mixup_prob:
+  default: 1.0
+  parser:
+    flags: ["--mixup-prob"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "Probability of performing mixup or cutmix when either/both is enabled"
+
+mixup_switch_prob:
+  default: 0.5
+  parser:
+    flags: ["--mixup-switch-prob"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "Probability of switching to cutmix when both mixup and cutmix enabled"
+
+mixup_mode:
+  default: "batch"
+  parser:
+    flags: ["--mixup-mode"]
+    nargs: [null]
+    const:
+    type: str
+    metavar:
+    action:
+    help: 'How to apply mixup/cutmix params. Per "batch", "pair", or "elem"'
+
+mixup_off_epoch:
+  default: 0
+  parser:
+    flags: ["--mixup-off-epoch"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "Turn off mixup after this epoch, disabled if 0 (default: 0)"
+
+smoothing:
+  default: 0.1
+  parser:
+    flags: ["--smoothing"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "Label smoothing (default: 0.1)"
+
+train_interpolation:
+  default: "random"
+  parser:
+    flags: ["--train-interpolation"]
+    nargs: [null]
+    const:
+    type: str
+    metavar:
+    action:
+    help: 'Training interpolation (random, bilinear, bicubic default: "random")'
+
+drop:
+  default: 0.0
+  parser:
+    flags: ["--drop"]
+    nargs: [null]
+    const:
+    type:
+    metavar: "PCT"
+    action:
+    help: "Dropout rate (default: 0.)"
+
+drop_connect:
+  default: null
+  parser:
+    flags: ["--drop-connect"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "Drop connect rate, DEPRECATED, use drop-path (default: None)"
+
+drop_path:
+  default: null
+  parser:
+    flags: ["--drop-path"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "PCT"
+    action:
+    help: "Drop path rate (default: None)"
+
+drop_block:
+  default: null
+  parser:
+    flags: ["--drop-block"]
+    nargs: [null]
+    const:
+    type: float
+    metavar: "PCT"
+    action:
+    help: "Drop block rate (default: None)"
+
+# Batch norm parameters (only works with gen_efficientnet based models currently)
+bn_momentum:
+  default: null
+  parser:
+    flags: ["--bn-momentum"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "Batch norm momentum override (if not None)"
+
+bn_eps:
+  default: null
+  parser:
+    flags: ["--bn-eps"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action:
+    help: "Batch norm epsilon override (if not None)"
+
+sync_bn:
+  default: 
+  parser:
+    flags: ["--sync-bn"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Enable NVIDIA Apex or Torch synchronized BatchNorm."
+
+dist_bn:
+  default: "reduce"
+  parser:
+    flags: ["--dist-bn"]
+    nargs: [null]
+    const:
+    type: str
+    metavar:
+    action:
+    help: 'Distribute BatchNorm stats between nodes after each epoch ("broadcast", "reduce", or "")'
+
+world_size:
+  default: 1
+  parser:
+    flags: ["--world-size"]
+    nargs: [null]
+    const:
+    type: int
+    metavar:
+    action: 
+    help: "Number of gpus available"
+
+split_bn:
+  default:
+  parser:
+    flags: ["--split-bn"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Enable separate BN layers per augmentation split."
+
+# Model Exponential Moving Average
+model_ema:
+  default: False
+  parser:
+    flags: ["--model-ema"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Enable tracking moving average of model weights"
+
+model_ema_force_cpu:
+  default: False
+  parser:
+    flags: ["--model-ema-force-cpu"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Force ema to be tracked on CPU, rank=0 node only. Disables EMA validation."
+
+model_ema_decay:
+  default: 0.9998
+  parser:
+    flags: ["--model-ema-decay"]
+    nargs: [null]
+    const:
+    type: float
+    metavar:
+    action: 
+    help: "decay factor for model weights moving average (default: 0.9998)"
+
+# Misc
+seed:
+  default: 42
+  parser:
+    flags: ["--seed"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "S"
+    action:
+    help: "random seed (default: 42)"
+
+worker_seeding:
+  default: "all"
+  parser:
+    flags: ["--worker-seeding"]
+    nargs: [null]
+    const:
+    type: str
+    metavar:
+    action:
+    help: "worker seed mode (default: all)"
+
+log_interval:
+  default: 50
+  parser:
+    flags: ["--log-interval"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "how many batches to wait before logging training status"
+
+recovery_interval:
+  default: 0
+  parser:
+    flags: ["--recovery-interval"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "how many batches to wait before writing recovery checkpoint"
+
+checkpoint_hist:
+  default: 10
+  parser:
+    flags: ["--checkpoint-hist"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "number of checkpoints to keep (default: 10)"
+
+workers:
+  default: 4
+  parser:
+    flags: ["-j", "--workers"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "how many training processes to use (default: 4)"
+
+save_images:
+  default: False
+  parser:
+    flags: ["--save-images"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "save images of input bathes every log interval for debugging"
+
+amp:
+  default:  False
+  parser:
+    flags: ["--amp"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "use NVIDIA Apex AMP or Native AMP for mixed precision training"
+
+amp_dtype:
+  default: "float16"
+  parser:
+    flags: ["--amp-dtype"]
+    nargs: [null]
+    const:
+    type: str
+    metavar:
+    action:
+    help: "lower precision AMP dtype (default: float16)"
+
+amp_impl:
+  default: "native"
+  parser:
+    flags: ["--amp-impl"]
+    nargs: [null]
+    const:
+    type: str
+    metavar:
+    action:
+    help: 'AMP impl to use, "native" or "apex" (default: native)'
+
+no_ddp_bb:
+  default: False
+  parser:
+    flags: ["--no-ddp-bb"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Force broadcast buffers for native DDP to off."
+
+synchronize_step:
+  default: False
+  parser:
+    flags: ["--synchronize-step"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "torch.cuda.synchronize() end of each step"
+
+pin_mem:
+  default: False
+  parser:
+    flags: ["--pin-mem"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "Pin CPU memory in DataLoader for more efficient (sometimes) transfer to GPU."
+
+no_prefetcher:
+  default: False
+  parser:
+    flags: ["--no-prefetcher"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "disable fast prefetcher"
+
+output:
+  default: ""
+  parser:
+    flags: ["--output"]
+    nargs: [null]
+    const:
+    type: str
+    metavar: "PATH"
+    action:
+    help: "path to output folder (default: none, current dir)"
+
+experiment:
+  default: ""
+  parser:
+    flags: ["--experiment"]
+    nargs: [null]
+    const:
+    type: str
+    metavar: "NAME"
+    action:
+    help: "name of train experiment, name of sub-folder for output"
+
+eval_metric:
+  default: "top1"
+  parser:
+    flags: ["--eval-metric"]
+    nargs: [null]
+    const:
+    type: str
+    metavar: "EVAL_METRIC"
+    action:
+    help: 'Best metric (default: "top1")'
+
+tta:
+  default: 0
+  parser:
+    flags: ["--tta"]
+    nargs: [null]
+    const:
+    type: int
+    metavar: "N"
+    action:
+    help: "Test/inference time augmentation (oversampling) factor. 0=None (default: 0)"
+
+use_multi_epochs_loader:
+  default: False
+  parser:
+    flags: ["--use-multi-epochs-loader"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "use the multi-epochs-loader to save time at the beginning of every epoch"
+
+log_wandb:
+  default: False
+  parser:
+    flags: ["--log-wandb"]
+    nargs: [null]
+    const:
+    type:
+    metavar:
+    action: "store_true"
+    help: "log training and validation metrics to wandb"
+
+distributed:
+  default: False
+  parser:
+    flags: ["--distributed"]
+    nargs: [null]
+    const:
+    type: 
+    metavar:
+    action:
+    help: "Distributed learning."

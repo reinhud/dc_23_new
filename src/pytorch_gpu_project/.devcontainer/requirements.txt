@@ -9,9 +9,10 @@ matplotlib==3.7.1
 seaborn==0.12.2
 torchinfo==1.7.2
 timm==0.9.2
-confuse==2.0.1  # not needed by timm
+confuse==2.0.1  
+pytorch-accelerated==0.1.47
 PyYAML==6.0
-tqdm==4.65.0
+tqdm==4.64.0
 
 
 # TODO: notebooks specific requirements, remove later, onmly for testing

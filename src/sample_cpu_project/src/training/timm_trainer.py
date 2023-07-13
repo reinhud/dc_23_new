@@ -38,7 +38,7 @@ from timm.scheduler import create_scheduler_v2, scheduler_kwargs
 from timm.utils import ApexScaler, NativeScaler
 from torch.nn.parallel import DistributedDataParallel as NativeDDP
 
-from training.config.training_config import TrainConfig
+from src.training.training_config import TrainConfig
 
 
 class TimmTrainer:
@@ -50,7 +50,7 @@ class TimmTrainer:
 
         self.has_apex = self._has_apex()
         self.has_native_amp = self._has_native_amp()
-        self.has_wandb = self._has_wand()
+        self.has_wand = self._has_wand()
         self.has_functorch = self._has_functorch()
         self.has_compile = hasattr(torch, "compile")
         self._logger = logging.getLogger("train")
@@ -835,7 +835,7 @@ class TimmTrainer:
         loader,
         loss_fn,
         train_config,
-        device=torch.device("cuda"),
+        device=torch.device("cpu"),  # TODO: fix for cpu
         amp_autocast=suppress,
         log_suffix="",
     ):
@@ -868,7 +868,7 @@ class TimmTrainer:
                         output = output.unfold(0, reduce_factor, reduce_factor).mean(
                             dim=2
                         )
-                        target = target[0: target.size(0): reduce_factor]
+                        target = target[0 : target.size(0) : reduce_factor]
 
                     loss = loss_fn(output, target)
                 acc1, acc5 = utils.accuracy(output, target, topk=(1, 5))
