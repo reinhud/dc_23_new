@@ -9,7 +9,7 @@ num_epochs:
 
 # model params
 model_name:
-  default: resnet34
+  default: resnet50
   description: model name 
 
 pretrained:
@@ -79,7 +79,7 @@ opt:
   description: optimizer name
 
 lr:
-  default: 0.01
+  default: 0.1
   description: learning rate
 
 weight_decay:

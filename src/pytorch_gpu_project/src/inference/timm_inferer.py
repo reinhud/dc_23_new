@@ -15,7 +15,7 @@ from timm.models import create_model
 from timm.utils import AverageMeter, set_jit_fuser, setup_default_logging
 
 
-class TimmInfererance:
+class TimmInferer:
     def __init__(self, infer_config):
         self.infer_config = infer_config
 

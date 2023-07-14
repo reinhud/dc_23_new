@@ -1,3 +1,6 @@
+import csv
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torchmetrics
@@ -87,5 +90,20 @@ class TimmMixupTrainer(Trainer):
         self.accuracy.reset()
         self.ema_accuracy.reset()
 
+    def save_run_history(self, train_history_path):
+        metric_names = self.run_history.get_metric_names()
+        first_row = ["epoch"] + list(metric_names)
+
+        # format history
+        metrics = np.array([self.run_history.get_metric_values(m_name) for m_name in metric_names])
+        epochs = np.arange(1, len(metrics[0]) + 1)
+        hist = np.concatenate(([epochs], metrics), axis=0)
+        hist = np.concatenate(([first_row], hist.T), axis=0)
+
+        # write to csv file
+        with open(train_history_path, "w") as f:
+            for epoch_row in hist:
+                csv_writer = csv.writer(f)
+                csv_writer.writerow(epoch_row)
 
 

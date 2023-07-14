@@ -10,3 +10,5 @@ if __name__ == '__main__':
     training = Training(coin_data, train_config)
 
     training.run()
+
+
