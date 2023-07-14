@@ -27,3 +27,4 @@ if __name__ == "__main__":
 # TODO: add logic to optionally save all trianing runs or only when model performed better, or only save some params like summary and args?  # noqa: E501
 # TODO: make logged output of training run prettier (tqdm bar for epochs and subbar for epoch?)
 # TODO: make config base class and subclass classes for train and infer configs, handle parsing and saving of configs there  # noqa: E501
+# TODO  when saving path from training, time is not correct

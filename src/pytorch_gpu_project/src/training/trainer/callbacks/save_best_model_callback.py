@@ -1,6 +1,5 @@
 import numpy as np
 from pytorch_accelerated.callbacks import TrainerCallback
-
 from src.training.config.train_config import TrainConfig
 from src.utils.model_manager import ModelManager
 
@@ -35,7 +34,7 @@ class SaveBestModelCallback(TrainerCallback):
         self.save_optimizer = save_optimizer
 
         self.model_manager = ModelManager()
-        self.run_path = self.model_manager.create_run_path(self.train_config.model_name)
+        self.run_path = self.model_manager.create_run_path_training(self.train_config.model_name)
         self.state_dict_path = f"{self.run_path}/best_model.pt"
         self.args_path = f"{self.run_path}/run_args.yaml"
         self.train_history_path = f"{self.run_path}/train_history.csv"

@@ -1,151 +1,104 @@
-import logging
-from contextlib import suppress
-from functools import partial
+import os
 
+import numpy as np
+import timm
 import torch
-from timm.data import (
-    ImageNetInfo,
-    create_dataset,
-    create_loader,
-    infer_imagenet_subset,
-    resolve_data_config,
-)
-from timm.layers import apply_test_time_pool
-from timm.models import create_model
-from timm.utils import AverageMeter, set_jit_fuser, setup_default_logging
+from PIL import Image
+from src.data.datasets.coin_data import CoinData
+from src.utils.model_manager import ModelManager
+from timm.data import resolve_data_config
+from timm.data.transforms_factory import create_transform
+from torchvision import transforms
 
+coin_data = CoinData()
 
 class TimmInferer:
-    def __init__(self, infer_config):
-        self.infer_config = infer_config
 
-        self.device = torch.device(self.infer_config.device)
-        self.has_compile = hasattr(torch, "compile")
-        self._memory_efficient_fusion = None
+    def __init__(
+        self,
+    ) -> None:
+        self.model_manager = ModelManager()
 
-        self.amp_autocast = self._setup_amp()
-        self.has_functorch = self._setup_functorch()
-        self._setup_cuda()
-        self._setup_fuser()
-
-        self.model = self._setup_model()
-        self.data_config = resolve_data_config(vars(self.infer_config), model=self.model)
-
-    def _setup_amp(self):
-        has_native_amp = False
-        try:
-            if getattr(torch.cuda.amp, "autocast") is not None:
-                has_native_amp = True
-        except AttributeError:
-            pass
-
-        # resolve AMP arguments based on PyTorch / Apex availability
-        amp_autocast = suppress
-        if self.infer_config.amp:
-            assert (
-                has_native_amp
-            ), "Please update PyTorch to a version with native AMP (or use APEX)."
-            assert self.infer_config.amp_dtype in ("float16", "bfloat16")
-            amp_dtype = torch.bfloat16 if self.infer_config.amp_dtype == "bfloat16" else torch.float16
-            amp_autocast = partial(torch.autocast, device_type=self.device.type, dtype=amp_dtype)
-            print("Running inference in mixed precision with native PyTorch AMP.")
+    def load_model(
+            self,
+            model_name=None,
+            watch_metric: str = "accuracy",
+            greater_is_better: bool = True
+    ):
+        """Load best model from training run, default to pretrained with base config."""
+        best_model_info = self.model_manager._get_best_model_info(model_name, watch_metric, greater_is_better)
+        if not best_model_info:
+            raise RuntimeError(f"Unable to build model: {model_name}, no training runs detected. Available model: {self.model_manager.get_all_models()}")
         else:
-            print("Running inference in float32. AMP not enabled.")
+            try:
+                checkpoint = torch.load(best_model_info['state_dict_path'])
+                # use number of classes that were used in the transfer learning
+                num_classes = checkpoint["model_state_dict"]["fc.weight"].shape[0]
+                model = timm.create_model(
+                    best_model_info["model_name"],
+                    pretrained=False,
+                    num_classes=num_classes,
+                )
 
-        return amp_autocast
-
-    def _setup_functorch(self):
-        try:
-            from functorch.compile import memory_efficient_fusion
-            self._memory_efficient_fusion = memory_efficient_fusion
-            print("Functorch found")
-            return True
-        except ImportError:
-            print("Functorch not found")
-            return False
-
-    def _setup_cuda(self):
-        if torch.cuda.is_available():
-            torch.backends.cuda.matmul.allow_tf32 = True
-            torch.backends.cudnn.benchmark = True
-
-    def _setup_fuser(self):
-        if self.infer_config.fuser:
-            set_jit_fuser(self.infer_config.fuser)
-
-    def _setup_model(self):
-        in_chans = 3
-        if self.infer_config.in_chans is not None:
-            in_chans = self.infer_config.in_chans
-        elif self.infer_config.input_size is not None:
-            in_chans = self.infer_config.input_size[0]
-
-        model = create_model(
-            self.infer_config.model,
-            num_classes=self.infer_config.num_classes,
-            in_chans=in_chans,
-            pretrained=self.infer_config.pretrained,
-            checkpoint_path="src/output/train/20230711-215544-resnet34-224/model_best.pth.tar",     # TODO: make this default to best trained model for that architechture
-        )
-
-        data_config = resolve_data_config(vars(self.infer_config), model=model)
-        test_time_pool = False
-        if self.infer_config.test_pool:
-            model, test_time_pool = apply_test_time_pool(model, data_config)
-
-        model = model.to(self.device)
-        model.eval()
-        if self.infer_config.channels_last:
-            model = model.to(memory_format=torch.channels_last)
-
-        if self.infer_config.torchscript:
-            model = torch.jit.script(model)
-        elif self.infer_config.torchcompile:
-            torchcompil_assert_error_msg = (
-                ("A version of torch w/ torch.compile() is required for"),
-            )
-            ("--compile, possibly a nightly.")
-            assert self.has_compile, torchcompil_assert_error_msg
-            torch._dynamo.reset()
-            model = torch.compile(model, backend=self.infer_config.torchcompile)
-        elif self.infer_config.aot_autograd:
-            assert self.has_functorch, "functorch is needed for --aot-autograd"
-            model = self.memory_efficient_fusion(model)
-
-        if self.infer_config.num_gpu > 1:
-            model = torch.nn.DataParallel(model, device_ids=list(range(self.infer_config.num_gpu)))
-
-        print(f"Model {self.infer_config.model} created, param count: {sum([m.numel() for m in model.parameters()])}")
-
+                # load state dict
+                model.load_state_dict(checkpoint["model_state_dict"])
+                print(f"Loaded model: {best_model_info['model_name']} from training run: {best_model_info['state_dict_path']}")
+            except:
+                raise RuntimeError(f"Unable to build best model: {model_name} from train history.")
         return model
 
-    def infer(self, inputs: list):
+    def infer(self, model, images, topk: False):
+        """Infer on a list of pictures."""
+        model.eval()    # TODO: should make eval before saving
 
-        # TODO: use the transforms used when training the model to transform the inputs
+        # transform pictures
+        transform = create_transform(**resolve_data_config(model.pretrained_cfg, model=model))
 
-        all_indices = []
-        all_labels = []
-        all_outputs = []
+        # Process PIL image with transforms and add a batch dimension
+        x = torch.stack([transform(image) for image in images], dim=0)
 
-        use_probs = self.infer_config.output_type == "prob"
-        top_k = min(self.infer_config.topk, self.infer_config.num_classes)
+        # Get the labels from the model config
+        labels = list(coin_data.class_to_idx.keys())
 
+        # infer on pictures
+        output = model(x)
 
-        with torch.no_grad():
-            for input in inputs:
-                with self.amp_autocast():
-                    output = self.model(input)
+        # Apply softmax to get predicted probabilities for each class
+        probabilities = torch.nn.functional.softmax(output, dim=1)
 
-                if use_probs:
-                    output = output.softmax(-1)
+        predictions = []
+        if topk:
+            # Grab the values and indices of top k predicted classes
+            for proba in probabilities:
+                v, i = torch.topk(proba, topk, dim=0)
+                pred = [{"label": labels[i.item()], "scores": round(v.item(), 4)} for i, v in zip(i, v)]
+                predictions.append(pred)
+        else:
+            for proba in probabilities:
+                v, i = torch.max(proba, dim=0)
+                pred = [{"label": labels[i.item()], "scores": round(v.item(), 4)}]
+                predictions.append(pred)
 
-                if top_k:
-                    output, indices = output.topk(top_k)
-                    np_indices = indices.cpu().numpy()
-                    all_indices.append(np_indices)
+        return predictions
 
-                    # TODO: get labels
+    def save_predictions(self, images, predictions):
+        """Save predictions."""
+        run_path = self.model_manager.create_run_path_inference()
+        for image, prediction in zip(images, predictions):
+            images_path = os.join(run_path, "images")
+            prediction_path = os.join(run_path, "predictions")
+            os.mkdir(images_path)
+            os.mkdir(prediction_path)
+            # TODO: finish
 
-                all_outputs.append(output.cpu().numpy())
+    def infer_from_file(self, file_path, model, images, topk: False):
+        """Infer on a single picture."""
+        if not os.path.exists(file_path):
+            raise RuntimeError(f"File: {file_path} does not exist.")
+        else:
+            img_path = os.path.join(file_path, images)
+            images = [Image.open(img_path) for img_path in os.listdir(img_path)]
 
-        return all_indices, all_labels, all_outputs
+        predictions = self.infer(model, images, topk)
+
+        return predictions

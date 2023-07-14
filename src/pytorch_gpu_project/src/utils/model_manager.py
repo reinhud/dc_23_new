@@ -17,9 +17,16 @@ class ModelManager:
         if not os.path.exists(self.inference_output_path):
             os.makedirs(self.inference_output_path)
 
-    def create_run_path(self, model_name: str):
+    def create_run_path_training(self, model_name: str):
         time_tag = dt.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
         run_path = f"{self.training_output_path}/{model_name}/{time_tag}"
+        if not os.path.exists(run_path):
+            os.makedirs(run_path)
+        return run_path
+
+    def create_run_path_inference(self, model_name: str):
+        time_tag = dt.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+        run_path = f"{self.inference_output_path}/{model_name}/{time_tag}"
         if not os.path.exists(run_path):
             os.makedirs(run_path)
         return run_path

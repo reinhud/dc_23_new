@@ -1,6 +1,7 @@
 from PIL import Image
 from src.inference.config.inference_config import InferenceConfig
-from src.inference.timm_inferer_new import TimmInferer
+
+from inference.timm_inferer import TimmInferer
 
 if __name__ == '__main__':
 
