@@ -1,6 +1,9 @@
+import os
+
 import numpy as np
 import timm
 import torch
+from PIL import Image
 from src.data.datasets.coin_data import CoinData
 from src.utils.model_manager import ModelManager
 from timm.data import resolve_data_config
@@ -54,37 +57,42 @@ class TimmInferer:
         # Process PIL image with transforms and add a batch dimension
         x = torch.stack([transform(image) for image in images], dim=0)
 
-
         # Get the labels from the model config
-
         labels = list(coin_data.class_to_idx.keys())
 
         # infer on pictures
         output = model(x)
 
-        print(output)
-
         # Apply softmax to get predicted probabilities for each class
-        probabilities = torch.nn.functional.softmax(output[0], dim=0)
+        probabilities = torch.nn.functional.softmax(output, dim=1)
 
-        print(probabilities)
-
-        #print(probabilities)
-
+        predictions = []
         if topk:
             # Grab the values and indices of top k predicted classes
-            values, indices = torch.topk(probabilities, topk)
+            for proba in probabilities:
+                v, i = torch.topk(proba, topk, dim=0)
+                pred = [{"label": labels[i.item()], "scores": round(v.item(), 4)} for i, v in zip(i, v)]
+                predictions.append(pred)
         else:
-            # Grab the values and indices of top prediction
-            values, indices = torch.max(probabilities, dim=0)
-
-        # Prepare a nice dict of top k predictions
-        predictions = [
-            {"label": labels[i], "score": v.item()}
-            for i, v in zip(indices, values)
-        ]
+            for proba in probabilities:
+                v, i = torch.max(proba, dim=0)
+                pred = [{"label": labels[i.item()], "scores": round(v.item(), 4)}]
+                predictions.append(pred)
 
         return predictions
 
     def save_predictions(self, predictions):
         """Save predictions to json."""
+
+
+
+    def infer_from_file(self, file_path, model, images, topk: False):
+        """Infer on a single picture."""
+        if not os.exists(file_path):
+            raise RuntimeError(f"File: {file_path} does not exist.")
+        else:
+            images = [Image.open(f"{file_path}/{img_path}") for img_path in os.listdir(file_path)]
+
+        predictions = self.infer(model, images, topk)
+
+        return predictions
