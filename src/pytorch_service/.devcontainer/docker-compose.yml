@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  pytorch_service:
+    env_file:
+      - ../../../.env
+    build:
+      context: ../../
+      dockerfile: pytorch_service/.devcontainer/Dockerfile.pytorch_service
+    volumes:
+      # Mount the root folder that contains .git
+      - ../../..:/workspace:cached
+      # Mount data folder
+      - ../../../data:/workspace/src/pytorch_service/src/data:cached 
+    
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

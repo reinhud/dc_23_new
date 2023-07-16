@@ -1,0 +1,18 @@
+# Ensure these req versions are in sync together with the following so that code quality checks are consistent:
+# - src/common/requirements.txt
+# - notebooks/.devcontainer/requirements.txt
+# - .github/workflows/requirements.txt
+# app
+fastapi==0.78.0
+pydantic==1.9.1
+uvicorn==0.18.2
+python-multipart==0.0.6
+
+# testing
+pytest==7.1.1
+anyio==3.6.1
+httpx==0.23.0
+asgi-lifespan==1.0.1
+
+# settings
+python-dotenv==0.20.0

@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  api:
+    env_file:
+      - ../.env
+    build: 
+      context: ..
+      dockerfile: src/Dockerfile.api
+    ports:
+      - "8000:80"
+    #command: uvicorn --reload --host 0.0.0.0 --port 80 api.src.fastapi_server:app
+    volumes:
+      # Mount the root folder that contains .git
+      - ..:/workspace:cached
+      # Mount data folder
+      - ../data:/workspace/src/pytorch_service/src/data:cached 

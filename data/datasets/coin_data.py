@@ -5,7 +5,7 @@ from timm.data import create_transform
 from timm.data.dataset import ImageDataset
 from timm.utils.misc import natural_key
 
-from src.data.datasets.coin_data_reader import CoinDataReader
+from pytorch_service.src.data.datasets.coin_data_reader import CoinDataReader
 
 
 class CoinData:
@@ -13,13 +13,16 @@ class CoinData:
 
     def __init__(
         self,
-        folder_path: str = "src/data/raw/CN_dataset_04_23/data_types_example",
     ) -> None:
-        self.folder_path = folder_path
+        if "pytorch_service" in os.getcwd():
+            self.folder_path = "src/data/raw/CN_dataset_04_23/data_types_example"
+        else:
+            self.folder_path = "pytorch_service/src/data/raw/CN_dataset_04_23/data_types_example"
+
         self.images_and_targets, self.class_to_idx = self._find_images_and_targets()
         if len(self.images_and_targets) == 0:
             raise RuntimeError(
-                f"Found 0 images in subfolders of {folder_path}. "
+                f"Found 0 images in subfolders of {self.folder_path}. "
                 f'Supported image extensions are {", ".join(self.types)}'
             )
         self.num_classes = len(self.class_to_idx)
